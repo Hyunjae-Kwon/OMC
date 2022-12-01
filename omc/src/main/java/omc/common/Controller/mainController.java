@@ -14,8 +14,8 @@ public class mainController {
     public String board_list(){
         return "goodsList";
     }
-    @RequestMapping("notice/list.do")
+    @RequestMapping("cart/cart.do")
     public String notice_list(){
-        return "notice";
+        return "goods/carttest";
     }
 }

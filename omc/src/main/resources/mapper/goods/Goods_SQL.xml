@@ -1,0 +1,281 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="goods">
+	
+	<!-- 상품 상세보기 -->
+	<select id="selectGoodsDetail" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT GD_NUM, GD_NAME, GD_PRICE, GD_DCPRICE, GD_DETAIL, GD_HITCOUNT, GD_AMOUNT, GD_POINT	
+			FROM GOODS G INNER JOIN GOODSIMAGES GI	
+			ON G.GD_NUM = GI.GD_NUM
+		]]>
+	</select>
+	
+	<!-- 상품 전체 리스트 -->
+	<select id="selectGoodsList" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM
+			ORDER BY DESC
+		]]>
+	</select>
+	
+	<!-- 상품 카테고리별 리스트 -->
+	<select id="selectGoodsListCategory" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			WHERE GD_CATEGORY=#{GD_CATEGORY}
+			ORDER BY DESC
+		]]>
+	</select>
+	
+	<!-- 상품 한줄 가져오기 (장바구니, 주문페이지에서 사용) -->
+	<select id="selectGoods" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN CART C 
+			ON G.GD_NUM=C.GD_NUM
+		]]>
+	</select>
+	
+	<!-- 상품 검색 -->
+	<select id="selectGoodsSearch" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM WHERE GD_NAME LIKE '%'||#{isSearch}||'%' 
+			ORDER BY GD_REGDATE DESC
+		]]>
+	</select>
+	
+	<!-- 전체 상품 정렬 (낮은가격순) -->
+	<select id="sortPriceLow" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			ORDER BY GD_NUM ASC
+		]]>
+	</select>
+	
+	<!-- 전체 상품 정렬 (높은가격순) -->
+	<select id="sortPriceHigh" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			ORDER BY GD_NUM DESC
+		]]>
+	</select>
+	
+	<!-- 전체 상품 정렬 (등록일순) -->
+	<select id="sortRegdate" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			ORDER BY GD_REGDATE DESC	
+		]]>
+	</select>
+	
+	<!-- 카테고리별 상품 정렬 (낮은가격순) -->
+	<select id="sortPriceLowCategory" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			WHERE GD_CATEGORY=#{GD_CATEGORY} 
+			ORDER BY GD_NUM ASC
+		]]>
+	</select>
+	
+	<!-- 카테고리별 상품 정렬 (높은가격순) -->
+	<select id="sortPriceHighCategory" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			WHERE GD_CATEGORY=#{GD_CATEGORY} 
+			ORDER BY GD_NUM DESC
+		]]>
+	</select>
+	
+	<!-- 카테고리별 상품 정렬 (등록일순) -->
+	<select id="sortRegdateCategory" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GOODS G INNER JOIN GOODSIMAGES GI 
+			ON G.GD_NUM=GI.GD_NUM 
+			WHERE GD_CATEGORY=#{GD_CATEGORY} 
+			ORDER BY GD_REGDATE DESC
+		]]>
+	</select>
+	
+	<!-- 주문하기 -->
+	<!-- 주문하기 위한 회원정보 가져오기 -->
+	<select id="orderMember" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT MEM_NUM, MEM_NAME, MEM_PHONE, MEM_EMAIL, MEM_ZIPCODE, MEM_ADDRESS1, MEM_ADDRESSDETAIL, MEM_POINT
+			FROM MEMBERS 
+			WHERE MEM_NUM=#{MEM_NUM}	
+		]]>
+	</select>
+	
+	<!-- 배송지 관리 -> 배송지 추가 -->
+	<select id="insertDelivery" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO DELIVERY (DV_NUM, MEM_NUM, DV_TITLE, DV_NAME, DV_ZIPCODE, DV_ADDRESS, DV_ADDRESSDETAIL, DV_PHONE)	
+			VALUES (SEQ_DELIVERY_DV_NUM, #{MEM_NUM}, #{DV_TITLE}, #{DV_NAME}, #{DV_ZIPCODE}, #{DV_ADDRESS}, #{DV_ADDRESSDETAIL}, #{DV_PHONE})	
+		]]>
+	</select>
+	
+	<!-- 배송지 관리 불러오기 -->
+	<select id="selectDelivery" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+				
+		]]>
+	</select>
+	
+	<!-- 주문내역 생성 -->
+	<select id="insertMemOrderList" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO "ORDER"(OD_NUM, MEM_NUM, DV_NUM, OD_NAME1, OD_PHONE1, OD_PRICE, OD_NAME2, OD_PHONE2, OD_ZIPCODE, OD_ADDRESS, OD_ADDRESSDETAIL, GD_NUM, OD_AMOUNT)	
+			VALUES (SEQ_ORDER_OD_NUM.NEXTVAL, #{MEM_NUM}, #{DV_NUM}, #{OD_NAME1}, #{OD_PHONE1}, (SELECT CT_AMOUNT * CT_PRICE FROM CART WHERE MEM_NUM=#{MEM_NUM} AND OD_NUM=0), #{OD_NAME2}, #{OD_PHONE2} #{OD_ZIPCODE}, #{OD_ADDRESS}, #{OD_ADDRESSDETAIL}, #{GD_NUM}, #{OD_AMOUNT})	
+		]]>
+	</select>
+	
+	<!-- 주문내역 생성 (비회원) "order" 테이블에 MEM_NUM 값이 NULL 일때 -->
+	<select id="insertNonOrderList" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT NONMEMBERS (NMEM_NUM, OD_NAME, OD_NUM) 
+			VALUES (SEQ_NONMEMBERS_NMEM_NUM.NEXTVAL, #{OD_NAME}, #{OD_NUM})	
+		]]>
+	</select>
+	
+	<!-- 보류 -->
+	<!-- 결제진행상황 -->
+	<select id="selectGoodsDetail" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '결제완료'
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '상품준비중'
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '배송중'
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '배송완료'
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '구매확정'
+			UPDATE TABLE "ORDER"(OD_RESULT) SET '취소'	
+		]]>
+	</select>
+	
+	<!-- 상품 교환/환불/취소 시 기존 주문 내역에서 삭제되어야 함 -->
+	
+	<!-- 상품 교환/환불/취소 -->
+	<select id="selectGoodsDetail" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO AFTERSERVICE (AS_NUM, OD_NUM, MEM_NUM, NMEM_NUM, AS_CATEGORY, AS_TITLE, AS_CONTENT, AS_ACCOUNT)	
+			VALUES (SEQ_AFTERSERVICE_AS_NUM.NEXTVAL, #{OD_NUM}, #{MEM_NUM}, #{NMEM_NUM}, #{AS_CATEGORY}, #{AS_TITLE}, #{AS_CONTENT}, #{AS_ACCOUNT})
+		]]>
+	</select>
+	
+	<!-- 페이징 -->
+	<select id="paging" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT AAA.*	
+			FROM(
+				SELECT COUNT(*) OVER() AS TOTAL_COUNT,AA.*	
+				FROM(
+					SELECT ROW_NUMBER() OVER (ORDER BY IDX DESC) RNUM, IDX, TITLE, HIT_CNT, TO_CHAR(CREA_DTM, 'YYYY.MM.DD') AS CREA_DTM	
+					FROM TB_BOARD	
+					WHERE DEL_GB = 'N') AA
+				) AAA	
+				WHERE AAA.RNUM 
+			BETWEEN #{START} AND #{END}
+		]]>
+	</select>
+	
+	<!-- 상품 리뷰 작성하기 -->
+	<select id="writeGDReview" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO GDREVIEW (RV_NUM, GD_NUM, MEM_NUM, RV_TITLE, RV_CONTENT, RV_GRADE, RV_IMAGE)	
+			VALUES (SEQ_REVIEW_RV_NUM, GD_NUM, MEM_NUM, #{RV_TITLE}, #{RV_CONTENT}, #{RV_GRADE}, #{RV_IMAGE})
+		]]>
+	</select>
+	
+	<!-- 상품 리뷰 작성을 위한 구매이력 검증 -->
+	<select id="GDValidator" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT MEM_NUM FROM "ORDER" WHERE OD_PAY='배송완료' AND MEM_NUM=#{MEM_NUM} AND GD_NUM=#{GD_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 리뷰 수정 -->
+	<select id="modifyGDReview" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			UPDATE GDREVIEW (SET RV_TITLE, RV_CONTENT, RV_IMAGE)	
+			SET (#{RV_TITLE}, #{RV_CONTENT}, #{RV_IMAGE})
+			WHERE MEM_NUM = #{MEM_NUM} AND RV_NUM= #{RV_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 리뷰 삭제 -->
+	<select id="deleteGDReview" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			DELETE FROM GDREVIEW	
+			WHERE RV_NUM=#{RV_NUM} AND MEM_NUM=#{MEM_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 리뷰 가져오기 -->
+	<select id="selectGDReview" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GDREVIEW 
+			WHERE GD_NUM=#{GD_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 QNA 작성하기 -->
+	<select id="writeGDqna" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO GDQNA (GQ_NUM, GD_NUM, MEM_NUM, GQ_TITLE, GQ_CONTENT, GQ_DATE, GQ_FILE)	
+			VALUES (SEQ_GOODSQNA_GQ_NUM.NEXTVAL, #{GD_NUM}, #{MEM_NUM}, #{GQ_TITLE}, #{GQ_CONTENT}, SYSDATE, #{GQ_FILE})
+		]]>
+	</select>
+	
+	<!-- QNA 수정 -->
+	<select id="modifyGDqna" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			UPDATE GDQNA (GQ_TITLE, GQ_CONTENT , GQ_FILE, GQ_CATEGORY)	
+			SET (#{GQ_TITLE}, #{GQ_CONTENT}, #{GQ_FILE}, #{GQ_CATEGORY})	
+			WHERE MEM_NUM = #{MEM_NUM} AND GQ_NUM= #{GQ_NUM}
+		]]>
+	</select>
+	
+	<!-- QNA 삭제 -->
+	<select id="deleteGDqna" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			DELETE FROM GDQNA	
+			WHERE GQ_NUM=#{GQ_NUM} AND MEM_NUM=#{MEM_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 QNA 가져오기 -->
+	<select id="selectGDqna" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			SELECT * 
+			FROM GDQNA 
+			WHERE GD_NUM=#{GD_NUM}
+		]]>
+	</select>
+	
+	<!-- 상품 QNA 답변달기 -->
+	<select id="commentGDqna" parameterType="hashmap" resultType="hashmap">
+		<![CDATA[
+			INSERT INTO GDQNA (GQ_COMMENT) 
+			VALUE #{GQ_COMMENT}
+		]]>
+	</select>
+	
+</mapper>
